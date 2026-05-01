@@ -13,17 +13,17 @@ Built a mini Security Operations Centre (SOC) environment using Docker container
 
 - ✅ Deployed Kali Linux attacker and DVWA target containers
 - ✅ Established network traffic baseline (mDNS, ARP)
-- ✅ Simulated complete 7-stage cyber kill chain
-- ✅ Captured packets in Wireshark & tcpdump
-- ✅ Documented 6 security findings in SOC report
+- ✅ Captured and analysed baseline traffic (mDNS/ARP) — SOC‑001
+- ✅ Simulated 6 attacks across the full Cyber Kill Chain
+- ✅ Documented 7 security findings in professional SOC report format
 - ✅ Mapped all attacks to MITRE ATT&CK framework
-
 ---
 
 ## ⚔️ Attacks Simulated
 
 | # | Attack | Tool | Severity | MITRE ATT&CK |
 |---|--------|------|----------|--------------|
+| 0 | **Baseline Traffic (mDNS)** | Wireshark | Info | — |
 | 1 | Reconnaissance | Nmap 7.99 | Medium | T1046 |
 | 2 | Information Disclosure | Browser | Medium | T1082 |
 | 3 | Brute Force | Hydra v9.6 | High | T1110 |
@@ -74,11 +74,35 @@ Built a mini Security Operations Centre (SOC) environment using Docker container
 - Docker Container Networking
 
 ---
+---
 
-## 🚀 Quick Start
+## 🔵 Blue Team / SOC Detection Notes
+
+> *How a defender would spot each attack — the thinking behind the triage.*
+
+| Attack | Detection Method |
+|--------|------------------|
+| **Nmap Scan** | Alert on >50 SYN packets from a single source in <5 seconds (simple threshold rule). Monitor for sequential port sweeps in firewall logs. |
+| **Info Disclosure** | Monitor web server access logs for hits to `/setup.php`, `phpinfo.php`, or paths containing `.env`. These pages should never be accessed in production. |
+| **Brute Force** | SIEM rule: >5 failed POST requests to `/login.php` from the same IP within 10 seconds. Track the ratio of `302 Found` vs `200 OK` responses on the login endpoint. |
+| **SQL Injection** | WAF signature detection on `' OR '1'='1` or `UNION SELECT` in HTTP parameters. Monitor database error logs for syntax errors indicating injection attempts. |
+| **Command Injection** | Detect shell metacharacters (`;`, `|`, `` ` ``, `$()`) in HTTP request body. Alert on web server spawning child processes like `whoami` or `cat`. |
+| **Webshell Upload** | File integrity monitoring on upload directories. Flag any `.php` file created inside `/uploads/`. Monitor for GET requests to suspicious paths with parameters such as `?cmd=` or `?exec=`. |
+
+**Key SOC Insight:** Baseline traffic (mDNS, ARP, DHCP) makes up most network noise. A strong analyst establishes "normal" first, then hunts for deviations — exactly what SOC‑001 captures in this lab. 
+
+## 🚀 Quick Start (Reproduce This Lab)
 
 ```bash
 git clone https://github.com/laiba1305/soc-network-attack-lab.git
 cd soc-network-attack-lab
-docker run -d -p 8080:80 --name dvwa-target vulnerables/web-dvwa
+
+# Start DVWA (host access at localhost:8080 → container port 80 at 172.17.0.2)
+# Start Kali attacker
 docker run -it --name kali-attacker kalilinux/kali-rolling bash
+
+# Inside Kali
+apt update && apt install -y nmap hydra curl tcpdump
+
+# Attack from Kali to DVWA's container IP
+nmap -sV 172.17.0.2
