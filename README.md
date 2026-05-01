@@ -92,6 +92,13 @@ Built a mini Security Operations Centre (SOC) environment using Docker container
 **Key SOC Insight:** Baseline traffic (mDNS, ARP, DHCP) makes up most network noise. A strong analyst establishes "normal" first, then hunts for deviations — exactly what SOC‑001 captures in this lab.
 
 ---
+---
+
+## 🔇 Noise Filtering
+
+The full Wireshark capture contains significant Docker Desktop background noise (TLS on ports 8089, 8191, 9229). Attack traffic is isolated to `tcp.port == 8080`.
+
+**Key skill:** 80-95% of real SOC traffic is harmless background noise. Filtering signal from noise is what separates analysts from tool operators — and it's the first thing this lab teaches.
 
 ## 📁 Evidence Inventory
 
@@ -104,8 +111,8 @@ Built a mini Security Operations Centre (SOC) environment using Docker container
 | `10-command-injection-whoami.png` | SOC-005 | Command Injection — www-data output |
 | `11-webshell-directory-listing.png` | SOC-006 | Directory listing showing shell.php |
 | `12-webshell-passwd-dump.png` | SOC-006 | /etc/passwd exfiltrated via webshell |
-| `14-wireshark-webshell-sqli.png` | SOC-004/006 | Wireshark capture of SQLi + webshell |
-| `captures/dvwa-attacks.pcapng` | All Findings | Full Wireshark packet capture — SQLi, command injection, webshell traffic |
+| `captures/dvwa-attacks.pcapng` | SOC-004, SOC-005, SOC-006 | Full Wireshark packet capture — webshell, SQLi, command injection |
+| `14-wireshark-webshell-sqli.png` | SOC-004/006 | Wireshark filtered on `tcp.port == 8080` showing attack traffic |
 
 Full set in [evidence/](evidence/)
 
