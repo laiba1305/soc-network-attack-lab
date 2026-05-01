@@ -105,6 +105,7 @@ Built a mini Security Operations Centre (SOC) environment using Docker container
 | `11-webshell-directory-listing.png` | SOC-006 | Directory listing showing shell.php |
 | `12-webshell-passwd-dump.png` | SOC-006 | /etc/passwd exfiltrated via webshell |
 | `14-wireshark-webshell-sqli.png` | SOC-004/006 | Wireshark capture of SQLi + webshell |
+| `captures/dvwa-attacks.pcapng` | All Findings | Full Wireshark packet capture — SQLi, command injection, webshell traffic |
 
 Full set in [evidence/](evidence/)
 
